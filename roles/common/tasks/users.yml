@@ -1,0 +1,42 @@
+---
+- name: Ensure groups exist
+  group:
+    name:  "{{ item }}"
+    state: present
+  with_items:
+    - "{{ users | map(attribute='groups') | flatten | unique }}"
+
+- name: Create user accounts
+  user:
+    name: "{{ item.username }}"
+    groups: "{{ item.groups }}"
+    shell: "/bin/bash"
+  with_items: 
+  - "{{ users }}"
+
+- name: "Add authorized keys"
+  authorized_key:
+    user: "{{ item.username }}"
+    key: "{{ lookup('file', 'files/ssh-keys/'+ item.username + '.key.pub') }}"
+  with_items: 
+  - "{{ users }}"
+
+- name: Allow admin users to sudo without a password
+  lineinfile:
+    dest: "/etc/sudoers.d/admin" # path: in version 2.3
+    state: "present"
+    regexp: "^%admin"
+    line: "%admin ALL=(ALL) NOPASSWD: ALL"
+    create: true
+
+- name: get the username running the deploy
+  become: false
+  command: whoami
+  register: remote_username
+
+- name: Delete the cloud_user
+  user:
+    name: cloud_user
+    state: absent
+  when: remote_username.stdout != "cloud_user"
+
