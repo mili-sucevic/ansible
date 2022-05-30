@@ -1,0 +1,15 @@
+---
+- hosts: all
+
+#- name: Set the java_packages variable (Debian/Ubuntu).
+#  set_fact:
+#    java_packages:
+#      - openjdk-8-jdk
+#  when: ansible_os_family == 'Debian'
+
+  roles:
+    - ansible-role-java
+#    - geerlingguy.elasticsearch
+#    - geerlingguy.logstash
+    - ansible-role-filebeat
+
