@@ -11,5 +11,5 @@
     - ansible-role-java
 #    - geerlingguy.elasticsearch
 #    - geerlingguy.logstash
-    - ansible-role-filebeat
+#    - ansible-role-filebeat
 
