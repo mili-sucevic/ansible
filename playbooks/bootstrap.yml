@@ -1,14 +1,26 @@
 ---
-- hosts: all
+- hosts: labservers
   tags: bootstrap
   vars:
-     ansible_ssh_private_key_file: ../../../home/ansible/.ssh/id_rsa.pub
+    ansible_ssh_private_key_file: ../../home/cloud_user/.ssh/id_rsa.pub
 
   become: true
 
+  tasks:
+  - name: create known_hosts
+    file:
+      path: "/home/cloud_user/.ssh/known_hosts"
+      state: touch
+
+  - name: ensure directories are 0744
+    file:
+      path: "/home/cloud_user/.ssh"
+      mode: 0744
+      recurse: yes
+
   roles:
     - name: common
-
+ 
   post_tasks:
     - name: Reboot
       reboot:

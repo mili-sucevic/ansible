@@ -3,3 +3,10 @@ users:
   - username: "ansible"
     groups:
     - admin
+
+new_users: []
+
+delete_users:
+  - username: "cloud_user"
+    groups:
+    - admin

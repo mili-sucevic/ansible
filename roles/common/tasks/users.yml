@@ -5,6 +5,7 @@
     state: present
   with_items:
     - "{{ users | map(attribute='groups') | flatten | unique }}"
+    - "{{ new_users | map(attribute='groups') | flatten | unique }}"
 
 - name: Create user accounts
   user:
@@ -13,6 +14,7 @@
     shell: "/bin/bash"
   with_items: 
   - "{{ users }}"
+  - "{{ new_users }}"
 
 - name: "Add authorized keys"
   authorized_key:
@@ -20,6 +22,7 @@
     key: "{{ lookup('file', 'files/ssh-keys/'+ item.username + '.key.pub') }}"
   with_items: 
   - "{{ users }}"
+  - "{{ new_users }}"
 
 - name: Allow admin users to sudo without a password
   lineinfile:
@@ -34,9 +37,10 @@
   command: whoami
   register: remote_username
 
-- name: Delete the cloud_user
+- name: Delete the users
   user:
-    name: cloud_user
+    name: "{{ item.username }}"
     state: absent
-  when: remote_username.stdout != "cloud_user"
-
+  when: remote_username.stdout != "{{ item.username }}"
+  with_items:
+  - "{{delete_users}}"
